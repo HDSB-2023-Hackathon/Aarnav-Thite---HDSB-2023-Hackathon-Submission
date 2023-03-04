@@ -2,31 +2,35 @@ import sys
 import random
 from PySide6 import QtCore, QtWidgets, QtGui
 
-class MyWidget(QtWidgets.QWidget):
+class Flashcards(QtWidgets.QDialog):
   def __init__(self):
     super().__init__()
 
-    self.hello = ["Hallo Welt", "Hei maailma", "Hola Mundo", "Привет мир"]
+class MainWindow(QtWidgets.QMainWindow):
+  def __init__(self):
+    super().__init__()
 
-    self.button = QtWidgets.QPushButton("Click me!")
-    self.text = QtWidgets.QLabel("Hello World",
+    self.button = QtWidgets.QPushButton("Add flashcard set")
+    self.text = QtWidgets.QLabel("You don't have any flashcard sets added yet.",
                                   alignment=QtCore.Qt.AlignCenter)
+    
+    widget = QtWidgets.QWidget()
+    self.setCentralWidget(widget)
+    gridLayout = QtWidgets.QGridLayout(widget)
+    gridLayout.addWidget(self.text, 0, 0)
+    gridLayout.addWidget(self.button, 1, 0)
 
-    self.layout = QtWidgets.QVBoxLayout(self)
-    self.layout.addWidget(self.text)
-    self.layout.addWidget(self.button)
+    self.button.clicked.connect(self.openFlashcards)
 
-    self.button.clicked.connect(self.magic)
-
-  @QtCore.Slot()
-  def magic(self):
-    self.text.setText(random.choice(self.hello))
+  def openFlashcards(self):
+    self.flashcards = Flashcards()
+    self.flashcards.show()
 
 if __name__ == "__main__":
   app = QtWidgets.QApplication([])
 
-  widget = MyWidget()
-  widget.resize(800, 600)
-  widget.show()
+  window = MainWindow()
+  window.resize(800, 600)
+  window.show()
 
   sys.exit(app.exec())
