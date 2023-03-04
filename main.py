@@ -1,5 +1,4 @@
 import sys
-import random
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
@@ -8,7 +7,7 @@ class Flashcards(QMainWindow):
   def __init__(self):
     super().__init__()
 
-    self.titleLabel = QLabel("Flashcard Set Title")
+    self.titleLabel = QLabel("Title: ")
     self.title = QLineEdit()
     self.titleSubmit = QPushButton("Next")
 
