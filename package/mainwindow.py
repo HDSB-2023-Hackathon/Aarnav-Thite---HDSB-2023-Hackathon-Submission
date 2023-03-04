@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt
-from package.flashcards import FlashcardsTitle
+from package.flashcards import Flashcards
 class MainWindow(QMainWindow):
   def __init__(self):
     super().__init__()
@@ -18,6 +18,6 @@ class MainWindow(QMainWindow):
     self.button.clicked.connect(self.openFlashcards)
 
   def openFlashcards(self):
-    self.flashcards = FlashcardsTitle()
+    self.flashcards = Flashcards()
     self.flashcards.resize(300, 100)
     self.flashcards.show()
