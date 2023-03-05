@@ -54,6 +54,7 @@ class MainWindow(QMainWindow):
     self.testCards = TestCards(title)
     self.testCards.resize(800, 600)
     self.testCards.show()
+    self.testCards.updated.connect(self.reload)
     self.hide()
 
   def reload(self):

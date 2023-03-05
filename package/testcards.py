@@ -5,6 +5,7 @@ import functools
 import random
 
 class TestCards(QMainWindow):
+  updated = Signal()
   def __init__(self, title):
     super().__init__()
 
@@ -28,6 +29,7 @@ class TestCards(QMainWindow):
   
   def complete(self):
     self.hide()
+    self.updated.emit()
 
 class PracticeScreen(QWidget):
   clicked = Signal(str, list)
@@ -64,6 +66,7 @@ class Practice(QWidget):
       self.flashcardList = json.load(f)
 
     self.cards = toDo
+    self.cardsLen = len(self.cards)
     self.title = title
     self.i = 0
     random.shuffle(self.cards)
@@ -92,7 +95,7 @@ class Practice(QWidget):
 
   def nextQ(self):
     if self.i >= len(self.cards):
-      self.flashcardList[self.title]["cards"] = self.cards
+      self.flashcardList[self.title]["cards"] = self.cards[0:self.cardsLen]
       self.flashcardList[self.title]["days"] += 1
       with open('flashcard.json', 'w') as f:
         json.dump(self.flashcardList, f)
