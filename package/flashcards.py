@@ -55,15 +55,26 @@ class FlashcardsTitle(QWidget):
     with open('flashcard.json', 'r') as f:
       flashcardList = json.load(f)
     title = self.title.text()
-    flashcardList[title] = []
+    if title in flashcardList:
+      temp = self.checkDuplicates(title, 1, flashcardList)
+      print(temp)
+      flashcardList[temp] = []
+    else:
+      flashcardList[title] = []
     with open('flashcard.json','w') as f:
       json.dump(flashcardList, f)
     if not title:
       self.title.setStyleSheet("border: 1px solid red")
     else:
       self.title.setStyleSheet("")
-      print(title)
       self.clicked.emit(title)
+  def checkDuplicates(self, name,number,  dict):
+    if f"{name}({number})" not in dict:
+      return f"{name}({number})"
+    else:
+      self.checkDuplicates(self, name, number+1, dict)
+
+
 
 class FlashcardsAdd(QWidget):
   cards = [("", "")]
