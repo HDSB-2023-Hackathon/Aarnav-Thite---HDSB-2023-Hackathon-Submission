@@ -3,7 +3,7 @@ from PySide6.QtWidgets import *
 import json
 global_title = ""
 class Flashcards(QMainWindow):
-  def __init__(self):
+  def __init__(self, title):
     super().__init__()
 
     self.central_widget = QStackedWidget()
@@ -12,12 +12,17 @@ class Flashcards(QMainWindow):
     self.titleScreen = FlashcardsTitle()
     self.addScreen = FlashcardsAdd()
 
-    self.central_widget.addWidget(self.titleScreen)
-    self.central_widget.setCurrentWidget(self.titleScreen)
+    if title:
+      self.resize(800, 600)
+      self.addScreen = FlashcardsAdd(title)
+      self.changeToAdd(title)
+    else:
+      self.central_widget.addWidget(self.titleScreen)
+      self.central_widget.setCurrentWidget(self.titleScreen)
 
-    self.setWindowTitle("Create Flashcard Set")
-    self.titleScreen.clicked.connect(lambda t: self.changeToAdd(t))
-    self.addScreen.done.connect(self.cobalt)
+      self.setWindowTitle("Create Flashcard Set")
+      self.titleScreen.clicked.connect(lambda t: self.changeToAdd(t))
+      self.addScreen.done.connect(self.cobalt)
 
   def changeToAdd(self, title):
     global global_title
@@ -52,15 +57,13 @@ class FlashcardsTitle(QWidget):
     self.title.returnPressed.connect(self.acceptTitle)
 
   def acceptTitle(self):
-    with open('flashcard.json', 'r') as f:
-      flashcardList = json.load(f)
     title = self.title.text()
-    if title in flashcardList:
-      flashcardList[self.checkDuplicates(title, 1, flashcardList)] = []
+    if title in self.flashcardList:
+      self.flashcardList[self.checkDuplicates(title, 1, self.flashcardList)] = []
     else:
-      flashcardList[title] = []
+      self.flashcardList[title] = []
     with open('flashcard.json','w') as f:
-      json.dump(flashcardList, f)
+      json.dump(self.flashcardList, f)
     if not title:
       self.title.setStyleSheet("border: 1px solid red")
     else:
@@ -78,9 +81,13 @@ class FlashcardsTitle(QWidget):
 class FlashcardsAdd(QWidget):
   cards = [("", "")]
   done = Signal()
-  def __init__(self):
+  with open('flashcard.json', 'r') as f:
+    flashcardList = json.load(f)
+
+  def __init__(self, title=""):
     super().__init__()
 
+  
     widget = QWidget()
 
     self.deck = QGroupBox("Deck")
@@ -88,7 +95,8 @@ class FlashcardsAdd(QWidget):
     self.deck.setLayout(self.deckVBox)
 
     self.selector = QListWidget()
-    self.selector.addItem(QListWidgetItem("New Flashcard"))
+    if not title:
+      self.selector.addItem(QListWidgetItem("New Flashcard"))
     self.selector.setCurrentRow(0)
     self.addButton = QPushButton("Add")
     self.removeButton = QPushButton("Remove")
@@ -107,8 +115,17 @@ class FlashcardsAdd(QWidget):
     self.answerLabel = QLabel("Answer")
     self.doneButton = QPushButton("Done")
 
-    self.questionEdit.setPlaceholderText("Jake Park is more commonly known as:")
-    self.answerEdit.setPlaceholderText("Lake")
+    if title:
+      self.cards = self.toTup(self.flashcardList[title])
+      for item in self.cards:
+        print(self.cards)
+        self.addCard(item[0], item[1])
+      self.selector.setCurrentRow(0)
+      self.questionEdit.setText(self.cards[0][0])
+      self.answerEdit.setText(self.cards[0][1])
+    else:
+      self.questionEdit.setPlaceholderText("Jake Park is more commonly known as:")
+      self.answerEdit.setPlaceholderText("Lake")
 
     self.cardVBox.addWidget(self.questionLabel)
     self.cardVBox.addWidget(self.questionEdit)
@@ -128,14 +145,14 @@ class FlashcardsAdd(QWidget):
     self.answerEdit.textChanged.connect(self.updateCards)
     self.selector.itemPressed.connect(self.updateQA)
     self.doneButton.clicked.connect(self.addToArray)
-  def addCard(self):
-    self.selector.addItem(QListWidgetItem("New Flashcard"))
-    self.cards.append(("", ""))
+
+  def addCard(self, q="", a=""):
+    self.selector.addItem(QListWidgetItem(q))
+    if q == "" and a == "":
+      self.cards.append(("", ""))
     self.selector.setCurrentRow(self.selector.count() - 1)
     self.questionEdit.setText("")
     self.answerEdit.setText("")
-    
-
 
   def removeCard(self):
     it = self.selector.takeItem(self.selector.currentRow())
@@ -170,3 +187,10 @@ class FlashcardsAdd(QWidget):
       json.dump(flashcardList, f)
     global_title = ""
     self.done.emit()
+
+  def toTup(self, list):
+    l = []
+    for item in list:
+      print('what')
+      l.append((item[0], item[1]))
+    return l

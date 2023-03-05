@@ -17,13 +17,13 @@ class MainWindow(QMainWindow):
     widget = QWidget()
     self.setCentralWidget(widget)
     gridLayout = QGridLayout(widget)
-    titles = flashcardList.keys()
+    titles = list(flashcardList.keys())
 
     self.deck = QGroupBox("Decks")
     self.deckVBox = QVBoxLayout()
     self.deckVBox.setAlignment(Qt.AlignTop)
     self.deck.setLayout(self.deckVBox)
-    
+
     if len(flashcardList) == 0:
       self.deckVBox.addWidget(self.text)
     else:
@@ -37,8 +37,9 @@ class MainWindow(QMainWindow):
         grid.addWidget(label, i, 0, 1, 2, Qt.AlignTop)
         grid.addWidget(editButton, i, 2, Qt.AlignTop)
         grid.addWidget(testButton, i, 3, Qt.AlignTop)
-        print(self.deck)
+        editButton.clicked.connect(lambda a=i: self.openFlashcards(titles[a]))
         i += 1
+      
       self.deckVBox.addLayout(grid)
 
     gridLayout.addWidget(self.deck, 0, 0)
@@ -46,7 +47,10 @@ class MainWindow(QMainWindow):
     self.setLayout(gridLayout)
     self.button.clicked.connect(self.openFlashcards)
 
-  def openFlashcards(self):
-    self.flashcards = Flashcards()
-    self.flashcards.resize(300, 100)
+  def openFlashcards(self, title=""):
+    self.flashcards = Flashcards(title)
+    if title:
+      self.flashcards.resize(800, 600)
+    else:
+      self.flashcards.resize(300, 100)
     self.flashcards.show()
