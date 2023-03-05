@@ -2,10 +2,11 @@ from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 import json
-global_title = ""
+global_title = "??"
 class Flashcards(QMainWindow):
   updated = Signal()
   def __init__(self, title):
+    global global_title
     super().__init__()
 
     self.central_widget = QStackedWidget()
@@ -18,6 +19,7 @@ class Flashcards(QMainWindow):
       self.resize(800, 600)
       self.addScreen = FlashcardsAdd(title)
       self.changeToAdd(title)
+      global_title = title
     else:
       self.central_widget.addWidget(self.titleScreen)
       self.central_widget.setCurrentWidget(self.titleScreen)
@@ -127,10 +129,11 @@ class FlashcardsAdd(QWidget):
     if title:
       with open('flashcard.json', 'r') as f:
         flashcardList = json.load(f)
+      print(flashcardList[title])
       self.cards = self.toTup(flashcardList[title])
       for item in self.cards:
         print(self.cards)
-        self.addCard(False, item[0], item[1])
+        self.addCard(False, item[0])
       self.selector.setCurrentRow(0)
       self.questionEdit.setText(self.cards[0][0])
       self.answerEdit.setText(self.cards[0][1])
@@ -157,7 +160,7 @@ class FlashcardsAdd(QWidget):
     self.selector.itemPressed.connect(self.updateQA)
     self.doneButton.clicked.connect(self.addToArray)
 
-  def addCard(self, isNew, q="New Flashcard", a=""):
+  def addCard(self, isNew, q="New Flashcard"):
     self.selector.addItem(QListWidgetItem(q))
     if isNew:
       self.cards.append(("", ""))
@@ -195,7 +198,13 @@ class FlashcardsAdd(QWidget):
     
     flashcardList[title] = []
     for item in self.cards:
-      flashcardList[title].append([item[0], item[1], 1])
+      dictionary = {
+        'question': item[0],
+        'answer': item[1],
+        'level': 1,
+        'practiced': False
+      }
+      flashcardList[title].append(dictionary)
     with open('flashcard.json','w') as f:
       json.dump(flashcardList, f)
     self.done.emit()
@@ -204,5 +213,5 @@ class FlashcardsAdd(QWidget):
     l = []
     for item in list:
       print('what')
-      l.append((item[0], item[1]))
+      l.append((item["question"], item["answer"]))
     return l
