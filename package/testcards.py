@@ -143,7 +143,8 @@ class Practice(QWidget):
 
   def handleWrong(self):
     self.cards[self.i]["level"] = 1
-    self.cards[self.i]["practiced"] = True
+    self.cards[self.i]["practiced"] = False
     print('wrong')
+    self.cards.append(self.cards[self.i])
     self.i += 1
     self.nextQ()
