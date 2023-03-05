@@ -61,7 +61,7 @@ class FlashcardsTitle(QWidget):
     with open('flashcard.json', 'r') as f:
       flashcardList = json.load(f)
     if title in flashcardList:
-      flashcardList[self.checkDuplicates(title, 1, self.flashcardList)] = []
+      flashcardList[self.checkDuplicates(title, 1, flashcardList)] = []
     else:
       flashcardList[title] = []
     with open('flashcard.json','w') as f:
@@ -83,8 +83,6 @@ class FlashcardsTitle(QWidget):
 class FlashcardsAdd(QWidget):
   cards = [("", "")]
   done = Signal()
-  with open('flashcard.json', 'r') as f:
-    flashcardList = json.load(f)
 
   def __init__(self, title=""):
     super().__init__()
@@ -117,7 +115,9 @@ class FlashcardsAdd(QWidget):
     self.doneButton = QPushButton("Done")
 
     if title:
-      self.cards = self.toTup(self.flashcardList[title])
+      with open('flashcard.json', 'r') as f:
+        flashcardList = json.load(f)
+      self.cards = self.toTup(flashcardList[title])
       for item in self.cards:
         print(self.cards)
         self.addCard(item[0], item[1])
