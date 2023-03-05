@@ -27,7 +27,7 @@ class MainWindow(QMainWindow):
     self.deck.setLayout(self.deckVBox)
     self.flashcards = Flashcards("")
 
-    if len(flashcardList) == 0:
+    if len(flashcardList) != 0:
       self.deckVBox.addWidget(self.text)
     else:
       self.seeAllDecks()
@@ -45,6 +45,7 @@ class MainWindow(QMainWindow):
       self.flashcards.resize(300, 100)
     self.flashcards.show()
     self.flashcards.updated.connect(self.reload)
+    self.hide()
 
   def testFlashcards(self, title=""):
     print(title)
@@ -52,12 +53,12 @@ class MainWindow(QMainWindow):
     testCards.show()
 
   def reload(self):
-    print('???')
     global flashcardList
     with open('flashcard.json', 'r') as f:
       flashcardList = json.load(f)
 
     self.seeAllDecks()
+    self.show()
     
   def seeAllDecks(self):
     global flashcardList
@@ -77,6 +78,8 @@ class MainWindow(QMainWindow):
       i += 1
     
     print(i)
+    self.deckVBox.removeWidget(self.text)
+    self.text.deleteLater()
     self.deckVBox.removeItem(self.grid)
     self.grid = grid
     self.deckVBox.addLayout(grid)

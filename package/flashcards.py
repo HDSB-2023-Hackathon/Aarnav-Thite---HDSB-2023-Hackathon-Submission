@@ -42,6 +42,7 @@ class Flashcards(QMainWindow):
     event.ignore()
 
     if res == QMessageBox.Yes:
+      self.updated.emit()
       event.accept()
 
 class FlashcardsTitle(QWidget):
