@@ -27,7 +27,7 @@ class MainWindow(QMainWindow):
     self.deck.setLayout(self.deckVBox)
     self.flashcards = Flashcards("")
 
-    if len(flashcardList) != 0:
+    if len(flashcardList) == 0:
       self.deckVBox.addWidget(self.text)
     else:
       self.seeAllDecks()
@@ -49,8 +49,9 @@ class MainWindow(QMainWindow):
 
   def testFlashcards(self, title=""):
     print(title)
-    testCards = TestCards(title)
-    testCards.show()
+    self.testCards = TestCards(title)
+    self.testCards.show()
+    self.hide()
 
   def reload(self):
     global flashcardList
@@ -78,8 +79,10 @@ class MainWindow(QMainWindow):
       i += 1
     
     print(i)
-    self.deckVBox.removeWidget(self.text)
-    self.text.deleteLater()
+    if len(flashcardList) == 1:
+      self.deckVBox.removeWidget(self.text)
+      self.text.deleteLater()
+    
     self.deckVBox.removeItem(self.grid)
     self.grid = grid
     self.deckVBox.addLayout(grid)
