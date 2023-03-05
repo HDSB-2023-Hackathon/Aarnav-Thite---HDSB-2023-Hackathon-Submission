@@ -3,7 +3,6 @@ from PySide6.QtWidgets import *
 import json
 import functools
 import random
-import time
 
 class TestCards(QMainWindow):
   updated = Signal()
@@ -48,7 +47,7 @@ class PracticeScreen(QWidget):
     self.practicedLabel = QLabel(f"You have practiced {self.practiced} cards today.", alignment=Qt.AlignCenter)
     self.practicedLabel.setStyleSheet("font-size: 20px; font-weight: bold")
     self.toDo = list(filter(lambda x: not x["practiced"], cards))
-    if int(time.time()) - flashcardList[title]["time"] >= flashcardList[title]["days"] * 86400 and len(self.toDo):
+    if len(self.toDo):
       self.practiceButton = QPushButton("Practice")
       self.practiceButton.clicked.connect(lambda c=None, t=title, a=self.toDo: self.clicked.emit(t, a))
       gridLayout.addWidget(self.practiceButton, 1, 0)
@@ -98,7 +97,6 @@ class Practice(QWidget):
     if self.i >= len(self.cards):
       self.flashcardList[self.title]["cards"] = self.cards[0:self.cardsLen]
       self.flashcardList[self.title]["days"] += 1
-      self.flashcardList[self.title]["time"] = int(time.time())
       with open('flashcard.json', 'w') as f:
         json.dump(self.flashcardList, f)
       self.complete.emit()
