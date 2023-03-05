@@ -1,5 +1,6 @@
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
+import re
 
 class Flashcards(QMainWindow):
   def __init__(self):
@@ -81,6 +82,9 @@ class FlashcardsAdd(QWidget):
     self.questionLabel = QLabel("Question")
     self.answerLabel = QLabel("Answer")
 
+    self.questionEdit.setPlaceholderText("Jake Park is more commonly known as:")
+    self.answerEdit.setPlaceholderText("Lake")
+
     gridLayout = QGridLayout(widget)
     gridLayout.addWidget(self.cardGroup, 0, 0, 4, 1, Qt.AlignLeft)
     gridLayout.addWidget(self.questionLabel, 0, 1, 1, 3)
@@ -111,7 +115,7 @@ class FlashcardsAdd(QWidget):
   def updateTitle(self):
     text = self.questionEdit.toPlainText()
     if text:
-      self.selector.currentItem().setText(text)
+      self.selector.currentItem().setText(text.replace("\n", " "))
     else:
       self.selector.currentItem().setText("New Flashcard")
 
