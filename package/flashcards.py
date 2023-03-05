@@ -32,7 +32,6 @@ class Flashcards(QMainWindow):
     self.central_widget.addWidget(self.addScreen)
     self.central_widget.setCurrentWidget(self.addScreen)
     self.resize(800, 600)
-    global_title = title
 
   def cobalt(self):
     self.hide()
@@ -68,13 +67,27 @@ class FlashcardsTitle(QWidget):
     self.title.returnPressed.connect(self.acceptTitle)
 
   def acceptTitle(self):
+    global global_title
+    with open('flashcard.json', 'r') as f:
+      flashcardList = json.load(f)
     title = self.title.text()
-
+    if title in flashcardList:
+      global_title = self.checkDuplicates(title, 1, flashcardList)
+    else:
+      global_title = title
+    with open('flashcard.json','w') as f:
+      json.dump(flashcardList, f)
     if not title:
       self.title.setStyleSheet("border: 1px solid red")
     else:
       self.title.setStyleSheet("")
       self.clicked.emit(title)
+
+  def checkDuplicates(self, name,number,  dict):
+    if f"{name}({number})" not in dict:
+      return f"{name} ({number})"
+    else:
+      self.checkDuplicates(self, name, number+1, dict)
 
 class FlashcardsAdd(QWidget):
   cards = [("", "")]
@@ -116,7 +129,7 @@ class FlashcardsAdd(QWidget):
       self.cards = self.toTup(flashcardList[title])
       for item in self.cards:
         print(self.cards)
-        self.addCard(item[0], item[1])
+        self.addCard(False, item[0], item[1])
       self.selector.setCurrentRow(0)
       self.questionEdit.setText(self.cards[0][0])
       self.answerEdit.setText(self.cards[0][1])
@@ -135,7 +148,7 @@ class FlashcardsAdd(QWidget):
     gridLayout.addWidget(self.card, 0, 1, 5, 3)
     self.setLayout(gridLayout)
 
-    self.addButton.clicked.connect(self.addCard)
+    self.addButton.clicked.connect(lambda: self.addCard(True))
     self.removeButton.clicked.connect(self.removeCard)
     self.questionEdit.textChanged.connect(self.updateTitle)
     self.questionEdit.textChanged.connect(self.updateCards)
@@ -143,9 +156,9 @@ class FlashcardsAdd(QWidget):
     self.selector.itemPressed.connect(self.updateQA)
     self.doneButton.clicked.connect(self.addToArray)
 
-  def addCard(self, q="", a=""):
+  def addCard(self, isNew, q="New Flashcard", a=""):
     self.selector.addItem(QListWidgetItem(q))
-    if q == "" and a == "":
+    if isNew:
       self.cards.append(("", ""))
     self.selector.setCurrentRow(self.selector.count() - 1)
     self.questionEdit.setText("")
@@ -177,7 +190,6 @@ class FlashcardsAdd(QWidget):
     global global_title
     with open('flashcard.json', 'r') as f:
       flashcardList = json.load(f)
-    global_title = self.checkDuplicates(global_title, 1, flashcardList)
     title = global_title
     
     flashcardList[title] = []
@@ -193,9 +205,3 @@ class FlashcardsAdd(QWidget):
       print('what')
       l.append((item[0], item[1]))
     return l
-  
-  def checkDuplicates(self, name, number, dict):
-    if f"{name}({number})" not in dict:
-      return f"{name} ({number})"
-    else:
-      self.checkDuplicates(self, name, number+1, dict)
