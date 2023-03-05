@@ -54,7 +54,7 @@ class FlashcardsTitle(QWidget):
       self.clicked.emit(title)
 
 class FlashcardsAdd(QWidget):
-  cards = [()]
+  cards = [("", "")]
 
   def __init__(self):
     super().__init__()
@@ -97,7 +97,7 @@ class FlashcardsAdd(QWidget):
 
   def addCard(self):
     self.selector.addItem(QListWidgetItem("New Flashcard"))
-    self.cards.append(tuple())
+    self.cards.append(("", ""))
     self.selector.setCurrentRow(self.selector.count() - 1)
     self.questionEdit.setText("")
     self.answerEdit.setText("")
@@ -108,7 +108,11 @@ class FlashcardsAdd(QWidget):
     self.cards.pop(self.selector.currentRow())
 
   def updateTitle(self):
-    self.selector.currentItem().setText(self.questionEdit.toPlainText())
+    text = self.questionEdit.toPlainText()
+    if text:
+      self.selector.currentItem().setText(text)
+    else:
+      self.selector.currentItem().setText("New Flashcard")
 
   def updateCards(self):
     self.cards[self.selector.currentRow()] = (self.questionEdit.toPlainText(), self.answerEdit.toPlainText())
