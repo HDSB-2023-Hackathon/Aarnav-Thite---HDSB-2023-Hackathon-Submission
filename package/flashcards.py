@@ -1,8 +1,10 @@
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 import json
 global_title = ""
 class Flashcards(QMainWindow):
+  updated = Signal()
   def __init__(self, title):
     super().__init__()
 
@@ -31,8 +33,17 @@ class Flashcards(QMainWindow):
     self.central_widget.setCurrentWidget(self.addScreen)
     self.resize(800, 600)
     global_title = title
+
   def cobalt(self):
     self.hide()
+    self.updated.emit()
+
+  def closeEvent(self, event: QCloseEvent):
+    res = QMessageBox().question(self, "Confirm Exit", "You have unsaved changes. Are you sure you want to exit?", QMessageBox.Yes | QMessageBox.No)
+    event.ignore()
+
+    if res == QMessageBox.Yes:
+      event.accept()
 
 class FlashcardsTitle(QWidget):
   clicked = Signal(str)
@@ -58,27 +69,12 @@ class FlashcardsTitle(QWidget):
 
   def acceptTitle(self):
     title = self.title.text()
-    with open('flashcard.json', 'r') as f:
-      flashcardList = json.load(f)
-    if title in flashcardList:
-      flashcardList[self.checkDuplicates(title, 1, flashcardList)] = []
-    else:
-      flashcardList[title] = []
-    with open('flashcard.json','w') as f:
-      json.dump(flashcardList, f)
+
     if not title:
       self.title.setStyleSheet("border: 1px solid red")
     else:
       self.title.setStyleSheet("")
       self.clicked.emit(title)
-
-  def checkDuplicates(self, name,number,  dict):
-    if f"{name}({number})" not in dict:
-      return f"{name}({number})"
-    else:
-      self.checkDuplicates(self, name, number+1, dict)
-
-
 
 class FlashcardsAdd(QWidget):
   cards = [("", "")]
@@ -181,9 +177,10 @@ class FlashcardsAdd(QWidget):
     global global_title
     with open('flashcard.json', 'r') as f:
       flashcardList = json.load(f)
+    global_title = self.checkDuplicates(global_title, 1, flashcardList)
     title = global_title
-    if flashcardList[title]:
-      flashcardList[title] = []
+    
+    flashcardList[title] = []
     for item in self.cards:
       flashcardList[title].append([item[0], item[1], 1])
     with open('flashcard.json','w') as f:
@@ -196,3 +193,9 @@ class FlashcardsAdd(QWidget):
       print('what')
       l.append((item[0], item[1]))
     return l
+  
+  def checkDuplicates(self, name, number, dict):
+    if f"{name}({number})" not in dict:
+      return f"{name} ({number})"
+    else:
+      self.checkDuplicates(self, name, number+1, dict)
