@@ -37,9 +37,10 @@ class MainWindow(QMainWindow):
         grid.addWidget(label, i, 0, 1, 2, Qt.AlignTop)
         grid.addWidget(editButton, i, 2, Qt.AlignTop)
         grid.addWidget(testButton, i, 3, Qt.AlignTop)
-        editButton.clicked.connect(lambda a=i: self.openFlashcards(titles[a]))
+        editButton.clicked.connect(lambda c=None, a=i: self.openFlashcards(titles[a]))
         i += 1
       
+      print(i)
       self.deckVBox.addLayout(grid)
 
     gridLayout.addWidget(self.deck, 0, 0)
@@ -48,6 +49,7 @@ class MainWindow(QMainWindow):
     self.button.clicked.connect(self.openFlashcards)
 
   def openFlashcards(self, title=""):
+    print(title)
     self.flashcards = Flashcards(title)
     if title:
       self.flashcards.resize(800, 600)
