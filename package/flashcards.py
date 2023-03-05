@@ -43,6 +43,7 @@ class FlashcardsTitle(QWidget):
     self.setLayout(gridLayout)
   
     self.titleSubmit.clicked.connect(self.acceptTitle)
+    self.title.returnPressed.connect(self.acceptTitle)
 
   def acceptTitle(self):
     title = self.title.text()
