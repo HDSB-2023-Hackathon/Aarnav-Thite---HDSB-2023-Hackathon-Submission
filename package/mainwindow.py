@@ -28,8 +28,8 @@ class MainWindow(QMainWindow):
       self.deckVBox.addWidget(self.text)
     else:
       i = 0
+      grid = QGridLayout()
       for item in titles:
-        grid = QGridLayout()
         editButton = QPushButton("Edit")
         testButton = QPushButton("Test")
         label = QLabel(item)
@@ -37,9 +37,9 @@ class MainWindow(QMainWindow):
         grid.addWidget(label, i, 0, 1, 2, Qt.AlignTop)
         grid.addWidget(editButton, i, 2, Qt.AlignTop)
         grid.addWidget(testButton, i, 3, Qt.AlignTop)
-        self.deckVBox.addLayout(grid)
         print(self.deck)
         i += 1
+      self.deckVBox.addLayout(grid)
 
     gridLayout.addWidget(self.deck, 0, 0)
     gridLayout.addWidget(self.button, 1, 0)
