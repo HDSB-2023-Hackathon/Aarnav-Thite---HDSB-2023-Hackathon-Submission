@@ -2,6 +2,7 @@ import json
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt
 from package.flashcards import Flashcards
+from package.testcards import TestCards
 
 flashcardList = {}
 
@@ -45,6 +46,11 @@ class MainWindow(QMainWindow):
     self.flashcards.show()
     self.flashcards.updated.connect(self.reload)
 
+  def testFlashcards(self, title=""):
+    print(title)
+    testCards = TestCards(title)
+    testCards.show()
+
   def reload(self):
     print('???')
     global flashcardList
@@ -67,6 +73,7 @@ class MainWindow(QMainWindow):
       grid.addWidget(editButton, i, 2, Qt.AlignTop)
       grid.addWidget(testButton, i, 3, Qt.AlignTop)
       editButton.clicked.connect(lambda c=None, a=i: self.openFlashcards(titles[a]))
+      testButton.clicked.connect(lambda c=None, a=i: self.testFlashcards(titles[a]))
       i += 1
     
     print(i)
