@@ -130,7 +130,7 @@ class FlashcardsAdd(QWidget):
       with open('flashcard.json', 'r') as f:
         flashcardList = json.load(f)
       print(flashcardList[title])
-      self.cards = self.toTup(flashcardList[title])
+      self.cards = self.toTup(flashcardList[title]["cards"])
       for item in self.cards:
         print(self.cards)
         self.addCard(False, item[0])
@@ -196,7 +196,9 @@ class FlashcardsAdd(QWidget):
       flashcardList = json.load(f)
     title = global_title
     
-    flashcardList[title] = []
+    flashcardList[title] = {}
+    flashcardList[title]["cards"] = []
+    flashcardList[title]["days"] = 1
     for item in self.cards:
       dictionary = {
         'question': item[0],
@@ -204,7 +206,7 @@ class FlashcardsAdd(QWidget):
         'level': 1,
         'practiced': False
       }
-      flashcardList[title].append(dictionary)
+      flashcardList[title]["cards"].append(dictionary)
     with open('flashcard.json','w') as f:
       json.dump(flashcardList, f)
     self.done.emit()
