@@ -52,33 +52,70 @@ class FlashcardsTitle(QWidget):
       self.title.setStyleSheet("")
       print(title)
       self.clicked.emit(title)
-      
 
 class FlashcardsAdd(QWidget):
+  cards = [()]
+
   def __init__(self):
     super().__init__()
 
     widget = QWidget()
 
-    self.cardGroup = QGroupBox("Card")
+    self.cardGroup = QGroupBox("Cards")
+    self.cardVBox = QVBoxLayout()
+    self.cardGroup.setLayout(self.cardVBox)
+
+    self.selector = QListWidget()
+    self.selector.addItem(QListWidgetItem("New Flashcard"))
+    self.selector.setCurrentRow(0)
+    self.addButton = QPushButton("Add")
+    self.removeButton = QPushButton("Remove")
+  
+    self.cardVBox.addWidget(self.selector)
+    self.cardVBox.addWidget(self.addButton)
+    self.cardVBox.addWidget(self.removeButton)
+
     self.questionEdit = QTextEdit()
     self.answerEdit = QTextEdit()
     self.questionLabel = QLabel("Question")
     self.answerLabel = QLabel("Answer")
 
-    self.selector = QListWidget()
-    self.selector.addItem(QListWidgetItem("Flashcard 1"))
-    self.selector.setCurrentRow(0)
-
-    self.addButton = QPushButton("Add")
-    self.removeButton = QPushButton("Remove")
-
     gridLayout = QGridLayout(widget)
-    gridLayout.addWidget(self.selector, 0, 0, 3, 1, Qt.AlignLeft)
-    gridLayout.addWidget(self.addButton, 3, 0, Qt.AlignLeft)
-    gridLayout.addWidget(self.removeButton, 4, 0, Qt.AlignLeft)
+    gridLayout.addWidget(self.cardGroup, 0, 0, 4, 1, Qt.AlignLeft)
     gridLayout.addWidget(self.questionLabel, 0, 1, 1, 3)
     gridLayout.addWidget(self.questionEdit, 1, 1, 1, 3)
     gridLayout.addWidget(self.answerLabel, 2, 1, 1, 3)
     gridLayout.addWidget(self.answerEdit, 3, 1, 1, 3)
     self.setLayout(gridLayout)
+
+    self.addButton.clicked.connect(self.addCard)
+    self.removeButton.clicked.connect(self.removeCard)
+    self.questionEdit.textChanged.connect(self.updateTitle)
+    self.questionEdit.textChanged.connect(self.updateCards)
+    self.answerEdit.textChanged.connect(self.updateCards)
+    self.selector.itemPressed.connect(self.updateQA)
+
+  def addCard(self):
+    self.selector.addItem(QListWidgetItem("New Flashcard"))
+    self.cards.append(tuple())
+    self.selector.setCurrentRow(self.selector.count() - 1)
+    self.questionEdit.setText("")
+    self.answerEdit.setText("")
+
+  def removeCard(self):
+    it = self.selector.takeItem(self.selector.currentRow())
+    del it
+    self.cards.pop(self.selector.currentRow())
+
+  def updateTitle(self):
+    self.selector.currentItem().setText(self.questionEdit.toPlainText())
+
+  def updateCards(self):
+    self.cards[self.selector.currentRow()] = (self.questionEdit.toPlainText(), self.answerEdit.toPlainText())
+    print(self.cards)
+
+  def updateQA(self):
+    row = self.selector.currentRow()
+    card = self.cards[row]
+    self.questionEdit.setText(card[0])
+    self.answerEdit.setText(card[1])
