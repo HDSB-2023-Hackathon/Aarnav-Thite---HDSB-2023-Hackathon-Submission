@@ -1,6 +1,5 @@
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
-import re
 
 class Flashcards(QMainWindow):
   def __init__(self):
