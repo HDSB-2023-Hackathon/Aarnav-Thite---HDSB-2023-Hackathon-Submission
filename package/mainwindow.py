@@ -1,6 +1,11 @@
+import json
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt
 from package.flashcards import Flashcards
+
+with open('flashcard.json', 'r') as f:
+      flashcardList = json.load(f)
+
 class MainWindow(QMainWindow):
   def __init__(self):
     super().__init__()
@@ -9,10 +14,20 @@ class MainWindow(QMainWindow):
     self.text = QLabel("You don't have any flashcard sets added yet.",
                                   alignment=Qt.AlignCenter)
     
+    self.selector = QListWidget()
+    for item in flashcardList:
+      self.selector.addItem(QListWidgetItem(item))
+    self.selector.setCurrentRow(0)
+    
     widget = QWidget()
     self.setCentralWidget(widget)
     gridLayout = QGridLayout(widget)
-    gridLayout.addWidget(self.text, 0, 0)
+
+    if len(flashcardList) == 0:
+      gridLayout.addWidget(self.text, 0, 0)
+    else:
+      gridLayout.addWidget(self.selector, 0, 0)
+
     gridLayout.addWidget(self.button, 1, 0)
 
     self.button.clicked.connect(self.openFlashcards)
