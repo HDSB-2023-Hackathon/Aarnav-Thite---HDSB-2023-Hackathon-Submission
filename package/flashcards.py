@@ -1,7 +1,7 @@
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 import json
-
+global_title = ""
 class Flashcards(QMainWindow):
   def __init__(self):
     super().__init__()
@@ -10,19 +10,24 @@ class Flashcards(QMainWindow):
     self.setCentralWidget(self.central_widget)
 
     self.titleScreen = FlashcardsTitle()
+    self.addScreen = FlashcardsAdd()
 
     self.central_widget.addWidget(self.titleScreen)
     self.central_widget.setCurrentWidget(self.titleScreen)
 
     self.setWindowTitle("Create Flashcard Set")
     self.titleScreen.clicked.connect(lambda t: self.changeToAdd(t))
+    self.addScreen.done.connect(self.cobalt)
 
   def changeToAdd(self, title):
+    global global_title
     self.setWindowTitle(title)
-    self.addScreen = FlashcardsAdd()
     self.central_widget.addWidget(self.addScreen)
     self.central_widget.setCurrentWidget(self.addScreen)
     self.resize(800, 600)
+    global_title = title
+  def cobalt(self):
+    self.hide()
 
 class FlashcardsTitle(QWidget):
   clicked = Signal(str)
@@ -62,7 +67,7 @@ class FlashcardsTitle(QWidget):
 
 class FlashcardsAdd(QWidget):
   cards = [("", "")]
-
+  done = Signal()
   def __init__(self):
     super().__init__()
 
@@ -112,17 +117,14 @@ class FlashcardsAdd(QWidget):
     self.questionEdit.textChanged.connect(self.updateCards)
     self.answerEdit.textChanged.connect(self.updateCards)
     self.selector.itemPressed.connect(self.updateQA)
-
-  def addCard(self, setName):
-    with open('flashcard.json', 'r') as f:
-      flashcardList = json.load(f)
+    self.doneButton.clicked.connect(self.addToArray)
+  def addCard(self):
     self.selector.addItem(QListWidgetItem("New Flashcard"))
     self.cards.append(("", ""))
     self.selector.setCurrentRow(self.selector.count() - 1)
     self.questionEdit.setText("")
     self.answerEdit.setText("")
-    with open('flashcard.json','w') as f:
-      json.dump(flashcardList, f)
+    
 
 
   def removeCard(self):
@@ -146,3 +148,15 @@ class FlashcardsAdd(QWidget):
     card = self.cards[row]
     self.questionEdit.setText(card[0])
     self.answerEdit.setText(card[1])
+
+  def addToArray(self):
+    global global_title
+    with open('flashcard.json', 'r') as f:
+      flashcardList = json.load(f)
+    title = global_title
+    for item in self.cards:
+      flashcardList[title].append([item[0], item[1], 1])
+    with open('flashcard.json','w') as f:
+      json.dump(flashcardList, f)
+    global_title = ""
+    self.done.emit()
