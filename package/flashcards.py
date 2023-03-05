@@ -1,6 +1,5 @@
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
-import re
 import json
 
 class Flashcards(QMainWindow):
@@ -69,9 +68,9 @@ class FlashcardsAdd(QWidget):
 
     widget = QWidget()
 
-    self.cardGroup = QGroupBox("Cards")
-    self.cardVBox = QVBoxLayout()
-    self.cardGroup.setLayout(self.cardVBox)
+    self.deck = QGroupBox("Deck")
+    self.deckVBox = QVBoxLayout()
+    self.deck.setLayout(self.deckVBox)
 
     self.selector = QListWidget()
     self.selector.addItem(QListWidgetItem("New Flashcard"))
@@ -79,24 +78,32 @@ class FlashcardsAdd(QWidget):
     self.addButton = QPushButton("Add")
     self.removeButton = QPushButton("Remove")
   
-    self.cardVBox.addWidget(self.selector)
-    self.cardVBox.addWidget(self.addButton)
-    self.cardVBox.addWidget(self.removeButton)
+    self.deckVBox.addWidget(self.selector)
+    self.deckVBox.addWidget(self.addButton)
+    self.deckVBox.addWidget(self.removeButton)
+
+    self.card = QGroupBox("Card")
+    self.cardVBox = QVBoxLayout()
+    self.card.setLayout(self.cardVBox)
 
     self.questionEdit = QTextEdit()
     self.answerEdit = QTextEdit()
     self.questionLabel = QLabel("Question")
     self.answerLabel = QLabel("Answer")
+    self.doneButton = QPushButton("Done")
 
     self.questionEdit.setPlaceholderText("Jake Park is more commonly known as:")
     self.answerEdit.setPlaceholderText("Lake")
 
+    self.cardVBox.addWidget(self.questionLabel)
+    self.cardVBox.addWidget(self.questionEdit)
+    self.cardVBox.addWidget(self.answerLabel)
+    self.cardVBox.addWidget(self.answerEdit)
+    self.cardVBox.addWidget(self.doneButton)
+
     gridLayout = QGridLayout(widget)
-    gridLayout.addWidget(self.cardGroup, 0, 0, 4, 1, Qt.AlignLeft)
-    gridLayout.addWidget(self.questionLabel, 0, 1, 1, 3)
-    gridLayout.addWidget(self.questionEdit, 1, 1, 1, 3)
-    gridLayout.addWidget(self.answerLabel, 2, 1, 1, 3)
-    gridLayout.addWidget(self.answerEdit, 3, 1, 1, 3)
+    gridLayout.addWidget(self.deck, 0, 0, 5, 1, Qt.AlignLeft)
+    gridLayout.addWidget(self.card, 0, 1, 5, 3)
     self.setLayout(gridLayout)
 
     self.addButton.clicked.connect(self.addCard)
