@@ -20,9 +20,9 @@ class Flashcards(QMainWindow):
       self.central_widget.addWidget(self.titleScreen)
       self.central_widget.setCurrentWidget(self.titleScreen)
 
-      self.setWindowTitle("Create Flashcard Set")
-      self.titleScreen.clicked.connect(lambda t: self.changeToAdd(t))
-      self.addScreen.done.connect(self.cobalt)
+    self.setWindowTitle("Create Flashcard Set")
+    self.titleScreen.clicked.connect(lambda t: self.changeToAdd(t))
+    self.addScreen.done.connect(self.cobalt)
 
   def changeToAdd(self, title):
     global global_title
@@ -58,12 +58,14 @@ class FlashcardsTitle(QWidget):
 
   def acceptTitle(self):
     title = self.title.text()
-    if title in self.flashcardList:
-      self.flashcardList[self.checkDuplicates(title, 1, self.flashcardList)] = []
+    with open('flashcard.json', 'r') as f:
+      flashcardList = json.load(f)
+    if title in flashcardList:
+      flashcardList[self.checkDuplicates(title, 1, self.flashcardList)] = []
     else:
-      self.flashcardList[title] = []
+      flashcardList[title] = []
     with open('flashcard.json','w') as f:
-      json.dump(self.flashcardList, f)
+      json.dump(flashcardList, f)
     if not title:
       self.title.setStyleSheet("border: 1px solid red")
     else:
@@ -86,7 +88,6 @@ class FlashcardsAdd(QWidget):
 
   def __init__(self, title=""):
     super().__init__()
-
   
     widget = QWidget()
 
@@ -181,11 +182,12 @@ class FlashcardsAdd(QWidget):
     with open('flashcard.json', 'r') as f:
       flashcardList = json.load(f)
     title = global_title
+    if flashcardList[title]:
+      flashcardList[title] = []
     for item in self.cards:
       flashcardList[title].append([item[0], item[1], 1])
     with open('flashcard.json','w') as f:
       json.dump(flashcardList, f)
-    global_title = ""
     self.done.emit()
 
   def toTup(self, list):
