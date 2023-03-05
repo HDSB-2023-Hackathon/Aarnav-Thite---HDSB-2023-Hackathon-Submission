@@ -1,6 +1,7 @@
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 import re
+import json
 
 class Flashcards(QMainWindow):
   def __init__(self):
@@ -47,7 +48,12 @@ class FlashcardsTitle(QWidget):
     self.title.returnPressed.connect(self.acceptTitle)
 
   def acceptTitle(self):
+    with open('flashcard.json', 'r') as f:
+      flashcardList = json.load(f)
     title = self.title.text()
+    flashcardList[title] = []
+    with open('flashcard.json','w') as f:
+      json.dump(flashcardList, f)
     if not title:
       self.title.setStyleSheet("border: 1px solid red")
     else:
@@ -100,12 +106,17 @@ class FlashcardsAdd(QWidget):
     self.answerEdit.textChanged.connect(self.updateCards)
     self.selector.itemPressed.connect(self.updateQA)
 
-  def addCard(self):
+  def addCard(self, setName):
+    with open('flashcard.json', 'r') as f:
+      flashcardList = json.load(f)
     self.selector.addItem(QListWidgetItem("New Flashcard"))
     self.cards.append(("", ""))
     self.selector.setCurrentRow(self.selector.count() - 1)
     self.questionEdit.setText("")
     self.answerEdit.setText("")
+    with open('flashcard.json','w') as f:
+      json.dump(flashcardList, f)
+
 
   def removeCard(self):
     it = self.selector.takeItem(self.selector.currentRow())
