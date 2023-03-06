@@ -48,16 +48,17 @@ class PracticeScreen(QWidget):
     gridLayout = QGridLayout(widget)
 
     day = flashcardList[title]["days"] % 64
+    lvlList = levelList[day]
+    lvlList.append(1)
     if int(time.time()) - flashcardList[title]["time"] >= flashcardList[title]["days"] + 86400:
       for i in cards:
         i["practiced"] = False
-        print(i["level"], levelList[day])
 
     self.practiced = functools.reduce(lambda x, y: x + y, list(map(lambda x: int(x["practiced"]), cards)))
     self.practicedLabel = QLabel(f"You have practiced {self.practiced} cards today.", alignment=Qt.AlignCenter)
     self.practicedLabel.setStyleSheet("font-size: 20px; font-weight: bold")
     
-    self.toDo = list(filter(lambda x: (not x["practiced"]) or (x["level"] in levelList[day]), cards))
+    self.toDo = list(filter(lambda x: (not x["practiced"]) or (x["level"] in lvlList), cards))
     if len(self.toDo):
       self.practiceButton = QPushButton("Practice")
       self.practiceButton.clicked.connect(lambda c=None, t=title, a=self.toDo: self.clicked.emit(t, a))
