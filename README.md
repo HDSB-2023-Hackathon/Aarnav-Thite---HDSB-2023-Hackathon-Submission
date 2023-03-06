@@ -2,6 +2,7 @@
 A customizable flash card app with spaced repetition features
 
 **Team**: Aarnav Thite, Elliot Fang, Cathy Zhang
+
 **Topic**: Education & Learning
 
 ## What is this?
