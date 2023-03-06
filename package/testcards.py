@@ -13,7 +13,6 @@ class TestCards(QMainWindow):
     self.central_widget = QStackedWidget()
     self.setCentralWidget(self.central_widget)
     self.practiceScreen = PracticeScreen(title)
-    # self.practice = Practice()
 
     self.setWindowTitle(f"Practice {title}")
     self.central_widget.addWidget(self.practiceScreen)
@@ -40,15 +39,26 @@ class PracticeScreen(QWidget):
 
     with open('flashcard.json', 'r') as f:
       flashcardList = json.load(f)
+    
+    with open('levels.json', 'r') as f:
+      levelList: list[list] = json.load(f)
+
     cards: list[dict] = flashcardList[title]["cards"]
     widget = QWidget()
     gridLayout = QGridLayout(widget)
 
+    day = flashcardList[title]["days"] % 64
+    if int(time.time()) - flashcardList[title]["time"] >= flashcardList[title]["days"] + 86400:
+      for i in cards:
+        i["practiced"] = False
+        print(i["level"], levelList[day])
+
     self.practiced = functools.reduce(lambda x, y: x + y, list(map(lambda x: int(x["practiced"]), cards)))
     self.practicedLabel = QLabel(f"You have practiced {self.practiced} cards today.", alignment=Qt.AlignCenter)
     self.practicedLabel.setStyleSheet("font-size: 20px; font-weight: bold")
-    self.toDo = list(filter(lambda x: not x["practiced"], cards))
-    if int(time.time()) - flashcardList[title]["time"] >= flashcardList[title]["days"] * 86400 and len(self.toDo):
+    
+    self.toDo = list(filter(lambda x: (not x["practiced"]) or (x["level"] in levelList[day]), cards))
+    if len(self.toDo):
       self.practiceButton = QPushButton("Practice")
       self.practiceButton.clicked.connect(lambda c=None, t=title, a=self.toDo: self.clicked.emit(t, a))
       gridLayout.addWidget(self.practiceButton, 1, 0)

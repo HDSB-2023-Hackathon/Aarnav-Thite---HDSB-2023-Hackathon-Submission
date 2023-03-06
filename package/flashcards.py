@@ -198,7 +198,7 @@ class FlashcardsAdd(QWidget):
     
     flashcardList[title] = {}
     flashcardList[title]["cards"] = []
-    flashcardList[title]["days"] = 1
+    flashcardList[title]["days"] = 0
     flashcardList[title]["time"] = 0
     for item in self.cards:
       dictionary = {
